@@ -53,7 +53,7 @@ shutil.copy(ROOT / 'Launcher/zh-Hans.lproj/Localizable.strings', resources / 'Lo
 with (ROOT / 'Launcher/Info.plist').open('rb') as f:
     info = plistlib.load(f)
 info.update(CFBundleExecutable='AutoRaise', CFBundleName='AutoRaise',
-    CFBundleIdentifier='nl.postware.autoraise', CFBundleShortVersionString=VERSION,
+    CFBundleIdentifier='com.sbmpost.AutoRaise', CFBundleShortVersionString=VERSION,
     CFBundleVersion='2026091101', CFBundleDevelopmentRegion='zh-Hans',
     CFBundleLocalizations=['zh-Hans'], LSMinimumSystemVersion='12.0')
 with (BUILD / 'assets.plist').open('rb') as f:

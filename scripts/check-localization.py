@@ -10,6 +10,8 @@ import platform
 root = Path(__file__).resolve().parents[1]
 build = root / 'build'
 app = build / 'AutoRaise.app'
+with (app / 'Contents/Info.plist').open('rb') as f:
+    assert plistlib.load(f)['CFBundleIdentifier'] == 'com.sbmpost.AutoRaise'
 engine = app / 'Contents/Resources/AutoRaise'
 for option in ['--help', '--version']:
     result = subprocess.run([str(engine), option], check=True, capture_output=True, text=True, timeout=10)
