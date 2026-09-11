@@ -1,233 +1,143 @@
-**AutoRaise**
+# AutoRaise 简体中文版
 
-When you hover a window it will be raised to the front (with a delay of your choosing) and gets the focus. There is also an option to warp
-the mouse to the center of the activated window when using the cmd-tab or cmd-grave (backtick) key combination.
-See also [on stackoverflow](https://stackoverflow.com/questions/98310/focus-follows-mouse-plus-auto-raise-on-mac-os-x)
+鼠标悬停在窗口上时，自动将窗口置于前面并获得焦点；使用 ⌘Tab 或 ⌘` 切换窗口时，也可以让鼠标跳转到激活窗口中央。
 
-AutoRaise works on windows. Panes drawn inside a single window, such as tmux or iTerm splits, are not windows as far as
-macOS is concerned and cannot be focused separately.
+本仓库是 **非官方简体中文分支**，基于 [sbmpost/AutoRaise](https://github.com/sbmpost/AutoRaise) 5.7，整合了 [AutoRaise-UI](https://github.com/sbmpost/AutoRaise-UI) 的菜单栏与设置界面。保留原作者 Stefan Post、Lothar Haeger 的署名及许可证。上游英文说明见 [README.en.md](README.en.md)。
 
-**Two repositories**
+## 下载与安装
 
-The repository you are currently looking at holds AutoRaise itself: the part that does the raising and focusing with all the command
-line options. The menu bar app with its preferences window is a separate project, [AutoRaise-UI](https://github.com/sbmpost/AutoRaise-UI).
-So things that are about the interface go there and anything about the raising and focusing belongs here.
+1. 打开 [最新中文版 Release](https://github.com/iamzjt-front-end/AutoRaise/releases/latest)，下载 `AutoRaise-5.7.1-zh-Hans-universal.dmg`。
+2. 打开 DMG，将 `AutoRaise.app` 拖入「Applications（应用程序）」文件夹。
+3. 退出旧版 AutoRaise，再从「应用程序」打开新版。
+4. 左键点击菜单栏气球图标，按系统提示在「系统设置 → 隐私与安全性 → 辅助功能」中允许 AutoRaise。
+5. 左键点击图标可启用／停用；右键点击可打开中文设置或退出。
 
-**Quick start**
+支持 **macOS 12 及以上**，同一安装包兼容 **Apple Silicon / Intel**。登录时自动打开功能需要 macOS 13 及以上。
 
-1. Download the [latest release](https://github.com/sbmpost/AutoRaise/releases/latest)
-2. In Finder, double click the downloaded file to unpack.
-3. Locate the unpacked folder and double click AutoRaise.dmg
-4. Single click AutoRaise under "Locations" in Finder.
-5. Drag AutoRaise.app into the Applications folder.
-6. Open AutoRaise from Applications.
-7. Left click the balloon icon in the menu bar to give permissions to AutoRaise in System/Accessibility.
-8. Right click the balloon icon in the menu bar to set preferences.
+安装包使用本地临时签名（ad hoc），没有 Apple Developer ID 签名或公证。如果 macOS 阻止打开，请先确认下载来源，再按系统提示到「系统设置 → 隐私与安全性」允许打开。不要关闭系统整体安全保护。
 
-*Important*: When you enable Accessibility in System Preferences, if you see an older AutoRaise item with balloon icon in the
-Accessibility pane, first remove it **completely** (clicking the minus). Then stop and start AutoRaise by left clicking the balloon
-icon. The item should re-appear so that you can properly enable Accessibility.
+如果覆盖安装后辅助功能失效，请先退出 AutoRaise，在辅助功能列表中移除旧条目，再添加 `/Applications/AutoRaise.app` 并授权。新版沿用原版应用标识和偏好设置，不能与旧版同时运行。
 
-**Compiling AutoRaise**
+## 汉化范围
 
-To compile AutoRaise yourself, download the master branch from [here](https://github.com/sbmpost/AutoRaise/archive/refs/heads/master.zip)
-and use the following commands:
+- 菜单栏、设置、关于页面、文本编辑菜单。
+- 置前与聚焦延迟、鼠标跳转、应用过滤、多屏选项及输入提示。
+- 辅助功能提示、登录项授权提示、重复实例提醒。
+- 快捷键录制、冲突提示和无障碍说明。
+- 命令行用法、版本信息、权限错误和本说明文档；调试事件日志保留英文，便于向上游反馈。
 
-    unzip -d ~ ~/Downloads/AutoRaise-master.zip
-    cd ~/AutoRaise-master && make clean && make && make install
+界面固定使用简体中文。参数名、布尔值、应用名称、正则表达式和配置键保持原格式，兼容原有配置。系统自行显示的权限对话框和错误详情使用系统语言。
 
-**Advanced compilation options**
+## 界面预览
 
-  * ALTERNATIVE_TASK_SWITCHER: The warp feature works accurately with the default OSX task switcher. Enable the alternative
-  task switcher flag if you use an alternative task switcher and are willing to accept that in some cases you may encounter
-  an unexpected mouse warp.
+![中文设置](docs/settings-zh-Hans.png)
 
-  * OLD_ACTIVATION_METHOD: Enable this flag if one of your applications is not raising properly. This can happen if the
-  application uses a non native graphic technology like GTK or SDL. It could also be a [wine](https://www.winehq.org) application.
-  Note this will introduce a deprecation warning.
+## 设置说明
 
-  * EXPERIMENTAL_FOCUS_FIRST: Enabling this flag adds support for first focusing the hovered window before actually raising it.
-  Or not raising at all if the -delay setting equals 0. This is an experimental feature. It relies on undocumented private API
-  calls. *As such there is absolutely no guarantee it will be supported in future OSX versions*.
+**置前**会将窗口移到其他窗口前面；**聚焦**将键盘输入焦点交给窗口。聚焦支持沿用上游实验性私有 API，部分应用可能不支持仅聚焦而不置前。
 
-Example advanced compilation command:
+- **置前与聚焦延迟**：滑块最左侧停用对应功能，其余位置按检测间隔递增。
+- **鼠标跳转**：切换应用时将鼠标移到目标窗口中央，可选跳转后放大指针或仅跨屏跳转。
+- **忽略应用／窗口标题**：使用英文逗号分隔，按回车保存；窗口标题支持 ICU 正则表达式。「反转」将忽略应用改为仅包含这些应用。
+- **保持焦点的应用标识**：填写 bundle identifier，例如 `com.apple.screencaptureui`，可避免框选截图时丢失焦点。
+- **临时停用按键**：按住 Control 或 Option 时暂停；「不使用」禁用临时停用按键；「反转」后仅按住指定按键时启用。
+- **快捷键**：录制全局启用／停用快捷键后重启应用生效。
+- **检测间隔**：单位毫秒，最小 20，默认 50；越短响应越快，CPU 占用也越高。
+- **鼠标移动阈值**：0 最灵敏；增大后需要更明显的移动才触发。
+- **隐藏菜单栏图标**：重新打开应用可恢复图标。
 
-    make CXXFLAGS="-DOLD_ACTIVATION_METHOD -DEXPERIMENTAL_FOCUS_FIRST" && make install
+AutoRaise 操作的是 macOS 窗口，不能分别聚焦同一窗口内部的 tmux 或 iTerm 分屏。
 
-**Running AutoRaise**
+## 从源码构建中文版
 
-After making the project, you end up with these two files:
+安装 Xcode 并完成首次启动配置，然后执行：
 
-    AutoRaise (command line version)
-    AutoRaise.app (version without GUI)
+```sh
+git clone https://github.com/iamzjt-front-end/AutoRaise.git
+cd AutoRaise
+python3 scripts/build-release.py
+```
 
-The first binary is to be used directly from the command line and accepts parameters. The second binary, AutoRaise.app, can
-be used without a terminal window and relies on the presence of a configuration file. AutoRaise.app runs on the background and
-can only be stopped via "Activity Monitor" or the AppleScript provided near the bottom of this README.
+输出为 `build/AutoRaise.app`。构建使用 Xcode 内置编译器、Interface Builder 和资源工具；MASShortcut 2.4.0 源码已随仓库提供，无需 CocoaPods 或额外下载依赖。
 
-**Command line usage:**
+```sh
+python3 scripts/check-localization.py
+python3 scripts/package-release.py
+```
 
-    ./AutoRaise -pollMillis 50 -delay 1 -warpX 0.5 -warpY 0.1 -scale 2.5 -warpOnlyAcrossScreens false -altTaskSwitcher false -requireMouseStop false -requireMultipleScreens false -requireScreenChange false -ignoreSpaceChanged false -ignoreApps "App1,App2" -ignoreTitles "^window$" -stayFocusedBundleIds "Id1,Id2" -disableKey control -mouseDelta 0.1
+打包产物位于 `dist/`，包括 DMG、应用 ZIP 和 SHA-256 校验文件。`scripts/package-release.py` 只本地打包，不上传或发布。
 
-*Note*: focusDelay is only supported when compiled with the "EXPERIMENTAL_FOCUS_FIRST" flag.
+原有 `make` / `make install` 仍用于构建、安装**不带设置界面的核心版本**，不要与上述菜单栏版本混淆。核心支持下列编译选项：
 
-  - pollMillis: How often to poll the mouse position and consider a raise/focus. Lower values increase responsiveness but also CPU load. Minimum = 20 and default = 50.
+- `OLD_ACTIVATION_METHOD`：为 GTK、SDL、Wine 等部分应用使用旧激活方式，会产生弃用警告。
+- `EXPERIMENTAL_FOCUS_FIRST`：启用先聚焦后置前或仅聚焦；依赖私有 API，未来 macOS 可能不再支持。
+- `ALTERNATIVE_TASK_SWITCHER`：默认启用第三方应用切换器适配，可能出现意外的鼠标跳转。
 
-  - delay: Raise delay, specified in units of pollMillis. Disabled if 0. A delay > 1 requires the mouse to stop for a moment before raising.
+中文版安装包启用前两个选项；第三方切换器行为可在界面中配置。
 
-  - focusDelay: Focus delay, specified in units of pollMillis. Disabled if 0. A delay > 1 requires the mouse to stop for a moment before focusing.
+## 命令行与配置文件
 
-  - warpX: A Factor between 0 and 1. Makes the mouse jump horizontally to the activated window. By default disabled.
+核心程序位于 `AutoRaise.app/Contents/Resources/AutoRaise`。可直接执行 `--help` 查看用法，或 `--version` 查看版本；这两个操作不会启动窗口控制服务。
 
-  - warpY: A Factor between 0 and 1. Makes the mouse jump vertically to the activated window. By default disabled.
+```sh
+./build/AutoRaise.app/Contents/Resources/AutoRaise -pollMillis 50 -delay 1 -verbose true
+```
 
-  - scale: Enlarge the mouse for a short period of time after warping it. The default is 2.0. To disable set it to 1.0.
+核心依次查找 `~/.AutoRaise`、`~/.config/AutoRaise/config`。菜单栏版本另外使用 macOS 偏好设置，并将界面值作为命令行参数传给核心；命令行参数优先。
 
-  - warpOnlyAcrossScreens: Only warp the mouse if the activated window is on a different screen than the mouse.
-    The default is false.
+```ini
+# AutoRaise 配置示例
+pollMillis=50
+delay=1
+focusDelay=0
+warpX=0.5
+warpY=0.5
+scale=2.0
+warpOnlyAcrossScreens=false
+altTaskSwitcher=false
+requireMouseStop=true
+requireMultipleScreens=false
+requireScreenChange=false
+ignoreSpaceChanged=false
+invertDisableKey=false
+invertIgnoreApps=false
+ignoreApps="IntelliJ IDEA,WebStorm"
+ignoreTitles="^window$"
+stayFocusedBundleIds="com.apple.SecurityAgent,com.apple.screencaptureui"
+disableKey="control"
+mouseDelta=0.1
+verbose=false
+```
 
-  - altTaskSwitcher: Set to true if you use 3rd party tools to switch between applications (other than standard command-tab).
+| 参数 | 含义 |
+| --- | --- |
+| `pollMillis` | 检测间隔，单位毫秒；最小 20，默认 50 |
+| `delay` / `focusDelay` | 置前／聚焦延迟；0 停用，1 无延迟，2 等待一个检测间隔，以此类推 |
+| `warpX` / `warpY` | 鼠标跳转的横／纵坐标比例，0～1；默认关闭 |
+| `scale` | 跳转后指针放大倍数；默认 2.0，1.0 关闭放大 |
+| `warpOnlyAcrossScreens` | 仅跨屏跳转，默认 false |
+| `altTaskSwitcher` | 使用第三方应用切换工具时设为 true |
+| `requireMouseStop` | 鼠标停止后才置前／聚焦，默认 true |
+| `requireMultipleScreens` | 仅连接至少两台显示器时置前／聚焦，默认 false |
+| `requireScreenChange` | 仅目标窗口与当前焦点窗口不同屏时置前／聚焦，默认 false |
+| `ignoreSpaceChanged` | 切换桌面空间后不立即置前／聚焦，默认 false |
+| `invertDisableKey` | 反转临时停用按键的作用，默认 false |
+| `invertIgnoreApps` | 将忽略列表改为包含列表，默认 false |
+| `ignoreApps` | 忽略的应用名，英文逗号分隔 |
+| `ignoreTitles` | 忽略的窗口标题或 ICU 正则表达式，英文逗号分隔 |
+| `stayFocusedBundleIds` | 不应失去焦点的应用标识，英文逗号分隔 |
+| `disableKey` | `control`、`option` 或 `disabled`；默认 `control` |
+| `mouseDelta` | 触发所需的鼠标移动距离，0.0 最灵敏 |
+| `verbose` | 在终端输出详细调试日志 |
 
-  - requireMouseStop: Require the mouse to stop moving before raise/focus. The default is true.
+即使未启用 `requireMouseStop`，大于 1 的延迟仍要求鼠标短暂停止。
 
-  - requireMultipleScreens: Only raise/focus while two or more screens are connected. The default is false.
+## 故障排查
 
-  - requireScreenChange: Only raise/focus when the window under the mouse is on a different screen than the window
-    that currently has focus. The default is false.
+确认已退出其他 AutoRaise 实例、辅助功能授权有效，并检查是否有其他鼠标工具干扰。可运行核心并加上 `-verbose true` 收集日志。
 
-  - ignoreSpaceChanged: Do not immediately raise/focus after a space change. The default is false.
+汉化与打包问题请提交到 [本仓库 Issues](https://github.com/iamzjt-front-end/AutoRaise/issues)。原版窗口控制问题可参考 [上游核心](https://github.com/sbmpost/AutoRaise)，界面来源见 [AutoRaise-UI](https://github.com/sbmpost/AutoRaise-UI)。
 
-  - invertDisableKey: Makes the disable AutoRaise key behave in the opposite way. The default is false.
+## 许可证与来源
 
-  - invertIgnoreApps: Turns the ignoreApps parameter into an includeApps parameter. The default is false.
-
-  - ignoreApps: Comma separated list of apps for which you would like to disable focus/raise.
-
-  - ignoreTitles: Comma separated list of window titles (a title can be an ICU regular expression) for which you would like to disable focus/raise.
-
-  - stayFocusedBundleIds: Comma separated list of app bundle identifiers that shouldn't lose focus even when hovering the mouse over another window.
-    For example com.apple.screencaptureui keeps focus where it is while a screenshot region is being selected.
-
-  - disableKey: Set to control, option or disabled. This will temporarily disable AutoRaise while holding the specified key. The default is control.
-
-  - mouseDelta: Requires the mouse to move a certain distance. 0.0 = most sensitive whereas higher values decrease sensitivity.
-
-  - verbose: Set to true to make AutoRaise show a log of events when started in a terminal.
-    
-AutoRaise can read these parameters from a configuration file. To make this happen, create a **~/.AutoRaise** file or a
-**~/.config/AutoRaise/config** file. The format is as follows:
-
-    #AutoRaise config file
-    pollMillis=50
-    delay=1
-    focusDelay=0
-    warpX=0.5
-    warpY=0.1
-    scale=2.5
-    warpOnlyAcrossScreens=false
-    altTaskSwitcher=false
-    requireMouseStop=true
-    requireMultipleScreens=false
-    requireScreenChange=false
-    ignoreSpaceChanged=false
-    invertDisableKey=false
-    invertIgnoreApps=false
-    ignoreApps="IntelliJ IDEA,WebStorm"
-    ignoreTitles="\\s\\| Microsoft Teams,^window$,..."
-    stayFocusedBundleIds="com.apple.SecurityAgent,com.apple.screencaptureui,..."
-    disableKey="control"
-    mouseDelta=0.1
-
-**AutoRaise.app usage:**
-
-    a) setup configuration file, see above ^
-    b) open /Applications/AutoRaise.app (allow Accessibility if asked for)
-    c) either stop AutoRaise via "Activity Monitor" or read on:
-
-To toggle AutoRaise on/off with a keyboard shortcut, paste the AppleScript below into an automator service workflow. Then
-bind the created service to a keyboard shortcut via System Preferences|Keyboard|Shortcuts. This also works for AutoRaise.app
-in which case "/Applications/AutoRaise" should be replaced with "/Applications/AutoRaise.app"
-
-Applescript:
-
-    on run {input, parameters}
-        tell application "Finder"
-            if exists of application process "AutoRaise" then
-                quit application "/Applications/AutoRaise"
-                display notification "AutoRaise Stopped"
-            else
-                launch application "/Applications/AutoRaise"
-                display notification "AutoRaise Started"
-            end if
-        end tell
-        return input
-    end run
-
-**Troubleshooting & Verbose logging**
-
-If you experience any issues, it is suggested to first check these points:
-
-- Are you using the latest version?
-- Does it work with the command line version?
-- Are you running other mouse tools that might intervene with AutoRaise?
-- Are you running two AutoRaise instances at the same time? Use "Activity Monitor" to check this.
-- Is Accessibility properly enabled? To be absolutely sure, remove any previous AutoRaise items
-that may be present in the System Preferences|Security & Privacy|Privacy|Accessibility pane. Then
-start AutoRaise and enable accessibility again.
-
-If after checking the above you still experience the problem, I encourage you to create an issue
-in github. It will be helpful to provide (a small part of) the verbose log, which can be enabled
-like so:
-
-    ./AutoRaise <parameters you would like to add> -verbose true
-
-The output should look something like this:
-
-    v5.7 by sbmpost(c) 2026, usage:
-
-    AutoRaise
-      -pollMillis <20, 30, 40, 50, ...>
-      -delay <0=no-raise, 1=no-delay, 2=50ms, 3=100ms, ...>
-      -focusDelay <0=no-focus, 1=no-delay, 2=50ms, 3=100ms, ...>
-      -warpX <0.5> -warpY <0.5> -scale <2.0>
-      -warpOnlyAcrossScreens <true|false>
-      -altTaskSwitcher <true|false>
-      -requireMouseStop <true|false>
-      -requireMultipleScreens <true|false>
-      -requireScreenChange <true|false>
-      -ignoreSpaceChanged <true|false>
-      -invertDisableKey <true|false>
-      -invertIgnoreApps <true|false>
-      -ignoreApps "<App1,App2, ...>"
-      -ignoreTitles "<Regex1, Regex2, ...>"
-      -stayFocusedBundleIds "<Id1,Id2, ...>"
-      -disableKey <control|option|disabled>
-      -mouseDelta <0.1>
-      -verbose <true|false>
-
-    Started with:
-      * pollMillis: 50ms
-      * delay: 0ms
-      * focusDelay: disabled
-      * ignoreSpaceChanged: false
-      * invertDisableKey: false
-      * invertIgnoreApps: false
-      * disableKey: control
-      * verbose: true
-
-    Compiled with:
-      * OLD_ACTIVATION_METHOD
-      * EXPERIMENTAL_FOCUS_FIRST
-
-    2026-02-01 14:25:56.192 AutoRaise[44780:1615626] AXIsProcessTrusted: YES
-    2026-02-01 14:25:56.216 AutoRaise[44780:1615626] System cursor scale: 1.000000
-    2026-02-01 14:25:56.234 AutoRaise[44780:1615626] Got run loop source: YES
-    2026-02-01 14:25:56.284 AutoRaise[44780:1615626] Mouse window: AutoRaise — AutoRaise -verbose 1
-    2026-02-01 14:25:56.285 AutoRaise[44780:1615626] Focused window: AutoRaise — AutoRaise -verbose 1
-    2026-02-01 14:25:56.287 AutoRaise[44780:1615626] Desktop origin (-1920.000000, -360.000000)
-    ...
-    ...
-
-*Note*: Dimentium created a homebrew formula for this tool which can be found here:
-
-https://github.com/Dimentium/homebrew-autoraise
+AutoRaise 和 Launcher 使用 GPL-3.0-or-later，见 [LICENSE.md](LICENSE.md)。MASShortcut 使用 BSD 许可证，见 [vendor/MASShortcut/LICENSE](vendor/MASShortcut/LICENSE)。源码来源与固定提交见 [Launcher/UPSTREAM.md](Launcher/UPSTREAM.md) 和 [vendor/MASShortcut/UPSTREAM.md](vendor/MASShortcut/UPSTREAM.md)。

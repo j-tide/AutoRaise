@@ -3,3 +3,6 @@ AutoRaise.out
 AutoRaise.app
 AutoRaise-UI/
 *~
+
+/build/
+/dist/

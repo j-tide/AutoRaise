@@ -66,7 +66,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var aboutText: NSTextField!
     @IBOutlet weak var homePage: URLButton!
     @IBOutlet weak var autoRaisePage: URLButton!
-    
+
     let appVersionString: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     let buildNumber: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as! String
 
@@ -136,10 +136,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menuItemPrefs.title = "设置…"
         menuItemPrefs.action = #selector(Preferences(_:))
         menu.addItem(menuItemPrefs)
-        
+
         // Separator
         menu.addItem(NSMenuItem.separator())
-        
+
         // "退出 AutoRaise" menuItem
         menuItemQuit.title = "退出 AutoRaise"
         menuItemQuit.action = #selector(quitApplication(_:))
@@ -326,7 +326,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    
+
     @IBAction func warpOnlyAcrossScreens(_ sender: NSButton) {
         warpOnlyAcrossScreens = warpOnlyAcrossScreensButton.state
         self.prefs.set(warpOnlyAcrossScreens == NSControl.StateValue.on ? "1" : "0",
@@ -345,7 +345,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.startService(self)
         }
     }
-    
+
     @IBAction func ignoreApps(_ sender: Any) {
         ignoreApps = ignoreAppsEdit.stringValue
         self.prefs.set(ignoreApps, forKey: "ignoreApps")
@@ -568,7 +568,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let url = URL(string: homePageUrl)!
         NSWorkspace.shared.open(url)
     }
-    
+
     @IBAction func autoRaisePagePressed(_ sender: NSButton) {
         let url = URL(string: autoRaiseUrl)!
         NSWorkspace.shared.open(url)
@@ -677,7 +677,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func Preferences(_ sender: AnyObject){
         self.window.makeKeyAndOrderFront(self)
     }
-    
+
     @objc func startService(_ sender: AnyObject) {
         if !autoRaiseService.isRunning {
             autoRaiseService = Process()
