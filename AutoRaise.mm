@@ -28,7 +28,7 @@
 #include <Carbon/Carbon.h>
 #include <libproc.h>
 
-#define AUTORAISE_VERSION "5.7"
+#define AUTORAISE_VERSION "5.7.1"
 #define STACK_THRESHOLD 20
 
 #ifdef EXPERIMENTAL_FOCUS_FIRST
@@ -480,9 +480,9 @@ AXUIElementRef get_mousewindow(CGPoint point) {
         static bool reported = false;
         if (!reported) {
             reported = true;
-            NSLog(@"Accessibility permission is not working, AutoRaise can not do anything. "
-                "If you rebuilt AutoRaise, remove it under System Settings > Privacy & "
-                "Security > Accessibility and add it again.");
+            NSLog(@"辅助功能权限未生效，AutoRaise 无法工作。"
+                "如果重新编译过 AutoRaise，请在「系统设置 → 隐私与"
+                "安全性 → 辅助功能」中移除后重新添加。");
         }
     } else if (verbose) {
         NSLog(@"Copy element: AXError %d", error);
@@ -1390,6 +1390,14 @@ CGEventRef eventTapHandler(CGEventTapProxy proxy, CGEventType type, CGEventRef e
 
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
+        bool showHelp = false;
+        for (int i = 1; i < argc; ++i) {
+            if (strcmp(argv[i], "--version") == 0) {
+                printf("AutoRaise 简体中文版 %s（基于上游 5.7）\n", AUTORAISE_VERSION);
+                return 0;
+            }
+            if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) { showHelp = true; }
+        }
         ConfigClass * config = [[ConfigClass alloc] init];
         [config readConfig: argc];
         [config validateParameters];
@@ -1410,11 +1418,11 @@ int main(int argc, const char * argv[]) {
         invertIgnoreApps   = [parameters[kInvertIgnoreApps] boolValue];
         invertDisableKey   = [parameters[kInvertDisableKey] boolValue];
 
-        printf("\nv%s by sbmpost(c) 2026, usage:\n\nAutoRaise\n", AUTORAISE_VERSION);
+        printf("\nv%s 简体中文版，原作者 sbmpost(c) 2026，用法：\n\nAutoRaise\n", AUTORAISE_VERSION);
         printf("  -pollMillis <20, 30, 40, 50, ...>\n");
-        printf("  -delay <0=no-raise, 1=no-delay, 2=%dms, 3=%dms, ...>\n", pollMillis, pollMillis*2);
+        printf("  -delay <0=不置前, 1=无延迟, 2=%dms, 3=%dms, ...>\n", pollMillis, pollMillis*2);
 #ifdef FOCUS_FIRST
-        printf("  -focusDelay <0=no-focus, 1=no-delay, 2=%dms, 3=%dms, ...>\n", pollMillis, pollMillis*2);
+        printf("  -focusDelay <0=不聚焦, 1=无延迟, 2=%dms, 3=%dms, ...>\n", pollMillis, pollMillis*2);
 #endif
         printf("  -warpX <0.5> -warpY <0.5> -scale <2.0>\n");
         printf("  -warpOnlyAcrossScreens <true|false>\n");
@@ -1432,12 +1440,14 @@ int main(int argc, const char * argv[]) {
         printf("  -mouseDelta <0.1>\n");
         printf("  -verbose <true|false>\n\n");
 
-        printf("Started with:\n");
+        if (showHelp) { return 0; }
+
+        printf("启动参数：\n");
         printf("  * pollMillis: %dms\n", pollMillis);
         if (delayCount) {
             printf("  * delay: %dms\n", (delayCount-1)*pollMillis);
         } else {
-            printf("  * delay: disabled\n");
+            printf("  * delay: 已停用\n");
         }
 #ifdef FOCUS_FIRST
         if ([parameters[kFocusDelay] intValue]) {
@@ -1446,7 +1456,7 @@ int main(int argc, const char * argv[]) {
             printf("  * focusDelay: %dms\n", (delayCount-1)*pollMillis);
         } else {
             raiseDelayCount = 1;
-            printf("  * focusDelay: disabled\n");
+            printf("  * focusDelay: 已停用\n");
         }
 #endif
 
@@ -1503,13 +1513,13 @@ int main(int argc, const char * argv[]) {
         } else if ([parameters[kDisableKey] isEqualToString: @"option"]) {
             printf("  * disableKey: option\n");
             disableKey = kCGEventFlagMaskAlternate;
-        } else { printf("  * disableKey: disabled\n"); }
+        } else { printf("  * disableKey: 已停用\n"); }
 
         if (mouseDelta) { printf("  * mouseDelta: %.1f\n", mouseDelta); }
 
         printf("  * verbose: %s\n", verbose ? "true" : "false");
 #if defined OLD_ACTIVATION_METHOD or defined FOCUS_FIRST or defined ALTERNATIVE_TASK_SWITCHER
-        printf("\nCompiled with:\n");
+        printf("\n编译选项：\n");
 #ifdef OLD_ACTIVATION_METHOD
         printf("  * OLD_ACTIVATION_METHOD\n");
 #endif
